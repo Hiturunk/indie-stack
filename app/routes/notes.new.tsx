@@ -5,13 +5,17 @@ import { useEffect, useRef } from "react";
 import { createNote } from "~/models/note.server";
 import { requireUserId } from "~/session.server";
 // Import the NFTStorage class and File constructor from the 'nft.storage' package
-import { NFTStorage, File } from 'nft.storage'
+import { NFTStorage, File } from 'nft.storage';
+import { MouseEvent } from "react";
+
 
 // The 'mime' npm package helps us set the correct file type on our File objects
-import mime from 'mime'
+import mime from 'mime';
 
 // The 'fs' builtin module on Node.js provides access to the file system
-import fs from 'fs'
+import fs from 'fs';
+var JSZip = require("jszip");
+const zip = new JSZip();
 
 // The 'path' module provides helpesuccess
 // Paste your NFT.Storage API key into the quotes:
@@ -70,32 +74,21 @@ const NFT_STORAGE_KEY = 'REPLACE_ME_WITH_YOUR_KEY'
     const result = await storeNFT(imagePath, name, description)
     console.log(result)
 }
-function filePickImage(){
-  let x = fileFromPath(y)
-}
-function filePickMeta(){
-  let x = fileFromPath(y)
-}
-function process(){}
-export default function nft(){
-    const zip = new JSZip();
-    const onChangeFile = () => {zip.loadAsync(content)
+async function readZipFile(path){
+  zip.loadAsync(path)
       .then(function(zip) {
-          console.log("zip read"); 
-      });}
+          console.log("zip read")
+          console.log(path)
+      });
+}
+export default function nft(){
     const action = async ({ request }: ActionArgs) => {
     const userId = await requireUserId(request);
   
     const formData = await request.formData();
     const file_location = formData.get("path");
+    const metadata_location = formData.get('metadatapath');
     const body = formData.get("body");
-  
-    if (typeof file_location !== "string" || title.length === 0) {
-      return json(
-        { errors: { body: null, title: "Title is required" } },
-        { status: 400 }
-      );
-    }
   
     if (typeof body !== "string" || body.length === 0) {
       return json(
@@ -127,7 +120,7 @@ export default function nft(){
         <span>API KEY: </span>
         <input
           ref={titleRef}
-          name="path"
+          name="apikey"
           className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
           aria-invalid={actionData?.errors?.title ? true : undefined}
           aria-errormessage={
@@ -138,7 +131,6 @@ export default function nft(){
       <label className="flex w-full flex-col gap-1">
         <span>Image Path: </span>
         <input
-          multiple
           type="file"
           ref={titleRef}
           name="path"
@@ -147,11 +139,10 @@ export default function nft(){
           aria-errormessage={
             actionData?.errors?.title ? "title-error" : undefined
           }
-          onChange={this.onChangeFile}
         />
         <div className="text-right">
       <button
-        onClick="filePickImage()"
+        onClick={filePickImage}
         className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
       >
         ...
@@ -161,7 +152,6 @@ export default function nft(){
       <label className="flex w-full flex-col gap-1">
         <span>Metadata Path: </span>
         <input
-          multiple
           type="file"
           ref={titleRef}
           name="metadataPath"
@@ -170,11 +160,10 @@ export default function nft(){
           aria-errormessage={
             actionData?.errors?.title ? "title-error" : undefined
           }
-          onChange={this.onChangeFile}
         />
         <div className="text-right">
       <button
-        onClick="filePickMeta()"
+        onClick={filePickMeta}
         className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
       >
         ...
@@ -210,7 +199,7 @@ export default function nft(){
 
     <div className="text-right">
       <button
-        onClick="process()"
+        type="submit"
         className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
       >
         Post NFT
