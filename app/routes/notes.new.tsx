@@ -4,7 +4,6 @@ import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import { createNote } from "~/models/note.server";
 import { requireUserId } from "~/session.server";
-import {JSZip} from '@JSZip';
 // Import the NFTStorage class and File constructor from the 'nft.storage' package
 import { NFTStorage, File } from 'nft.storage'
 
